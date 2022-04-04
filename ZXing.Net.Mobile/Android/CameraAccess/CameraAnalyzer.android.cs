@@ -160,7 +160,7 @@ namespace ZXing.Mobile.CameraAccess
 
 			// var result = barcodeReader.Decode(fast);
 			var barcodeReader = scannerHost.ScanningOptions.BuildBarcodeReader();
-			result = barcodeReader.Decode(fast);
+			var result = barcodeReader.Decode(fast);
 
 			fastArray.Dispose();
 			fastArray = null;
