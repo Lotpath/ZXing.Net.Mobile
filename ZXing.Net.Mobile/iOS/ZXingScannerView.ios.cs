@@ -102,14 +102,17 @@ namespace ZXing.Mobile
 				{ AVCaptureSession.PresetMedium, new CameraResolution    { Width = 480,  Height = 360 } },	//480x360
 				{ AVCaptureSession.Preset640x480, new CameraResolution   { Width = 640,  Height = 480 } },
 				{ AVCaptureSession.Preset1280x720, new CameraResolution  { Width = 1280, Height = 720 } },
-				{ AVCaptureSession.Preset1920x1080, new CameraResolution { Width = 1920, Height = 1080 } }
+				{ AVCaptureSession.Preset1920x1080, new CameraResolution { Width = 1920, Height = 1080 } },
+				{ AVCaptureSession.Preset3840x2160, new CameraResolution { Width = 3840, Height = 2160 } }
 			};
 
 			// configure the capture session for low resolution, change this if your code
 			// can cope with more data or volume
+						
+
 			session = new AVCaptureSession()
 			{
-				SessionPreset = AVCaptureSession.Preset640x480
+				SessionPreset = PresetConverter.ToAVCaptureSessionPreset(ScanningOptions.CameraResolutionPreset)
 			};
 
 			// create a device input and attach it to the session
@@ -258,7 +261,7 @@ namespace ZXing.Mobile
 			});
 
 			output.AlwaysDiscardsLateVideoFrames = true;
-			output.SetSampleBufferDelegate(outputRecorder, queue);
+			output.SetSampleBufferDelegateQueue(outputRecorder, queue);
 
 			PerformanceCounter.Stop(perf4, "PERF: SetupCamera Finished.  Took {0} ms.");
 
@@ -309,14 +312,14 @@ namespace ZXing.Mobile
 
 				if (UIDevice.CurrentDevice.CheckSystemVersion(7, 0) && captureDevice.AutoFocusRangeRestrictionSupported)
 				{
-					captureDevice.AutoFocusRangeRestriction = AVCaptureAutoFocusRangeRestriction.Near;
+					captureDevice.AutoFocusRangeRestriction = AVCaptureAutoFocusRangeRestriction.None;
 				}
 
 				if (captureDevice.FocusPointOfInterestSupported)
-					captureDevice.FocusPointOfInterest = new PointF(0.5f, 0.5f);
+					captureDevice.FocusPointOfInterest = new PointF(ScanningOptions.FocusPointOfInterest.X, ScanningOptions.FocusPointOfInterest.Y);
 
 				if (captureDevice.ExposurePointOfInterestSupported)
-					captureDevice.ExposurePointOfInterest = new PointF(0.5f, 0.5f);
+					captureDevice.ExposurePointOfInterest = new PointF(ScanningOptions.FocusPointOfInterest.X, ScanningOptions.FocusPointOfInterest.Y);
 
 				captureDevice.UnlockForConfiguration();
 			}
@@ -370,7 +373,7 @@ namespace ZXing.Mobile
 			if (AVMediaType.Video == null)
 				return;
 
-			var device = AVCaptureDevice.DefaultDeviceWithMediaType(AVMediaType.Video);
+			var device = AVCaptureDevice.GetDefaultDevice(AVMediaTypes.Video);
 
 			if (device == null)
 				return;
@@ -567,6 +570,9 @@ namespace ZXing.Mobile
 				if (UIDevice.CurrentDevice.CheckSystemVersion(7, 0) && captureDevice.AutoFocusRangeRestrictionSupported)
 					captureDevice.AutoFocusRangeRestriction = captureDeviceOriginalConfig.AutoFocusRangeRestriction;
 
+				if (captureDevice.IsFocusModeSupported(captureDeviceOriginalConfig.FocusMode))
+					captureDevice.FocusMode = captureDeviceOriginalConfig.FocusMode;
+
 				if (captureDevice.FocusPointOfInterestSupported)
 					captureDevice.FocusPointOfInterest = captureDeviceOriginalConfig.FocusPointOfInterest;
 
@@ -613,12 +619,12 @@ namespace ZXing.Mobile
 		{
 			try
 			{
-				var device = captureDevice ?? AVCaptureDevice.DefaultDeviceWithMediaType(AVMediaType.Video);
+				var device = captureDevice ?? AVCaptureDevice.GetDefaultDevice(AVMediaTypes.Video);
 				if (device != null && (device.HasTorch || device.HasFlash))
 				{
 					device.LockForConfiguration(out var err);
 
-					if (err != null)
+					if (err == null)
 					{
 						if (on)
 						{
@@ -678,7 +684,7 @@ namespace ZXing.Mobile
 				if (hasTorch.HasValue)
 					return hasTorch.Value;
 
-				var device = captureDevice ?? AVCaptureDevice.DefaultDeviceWithMediaType(AVMediaType.Video);
+				var device = captureDevice ?? AVCaptureDevice.GetDefaultDevice(AVMediaTypes.Video);
 				hasTorch = device.HasFlash || device.HasTorch;
 				return hasTorch.Value;
 			}

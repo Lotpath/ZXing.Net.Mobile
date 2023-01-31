@@ -6,123 +6,133 @@ using ZXing;
 
 namespace ZXing.Mobile
 {
-	public class MobileBarcodeScanningOptions
-	{
-		/// <summary>
-		/// Camera resolution selector delegate, must return the selected Resolution from the list of available resolutions
-		/// </summary>
-		public delegate CameraResolution CameraResolutionSelectorDelegate(List<CameraResolution> availableResolutions);
+    public class MobileBarcodeScanningOptions
+    {
+        /// <summary>
+        /// Camera resolution selector delegate, must return the selected Resolution from the list of available resolutions
+        /// </summary>
+        public delegate CameraResolution CameraResolutionSelectorDelegate(List<CameraResolution> availableResolutions);
 
-		public MobileBarcodeScanningOptions()
-		{
-			PossibleFormats = new List<BarcodeFormat>();
-			//this.AutoRotate = true;
-			DelayBetweenAnalyzingFrames = 150;
-			InitialDelayBeforeAnalyzingFrames = 300;
-			DelayBetweenContinuousScans = 1000;
-			UseNativeScanning = false;
-			ScanningArea = ScanningArea.Default;
-		}
+        public MobileBarcodeScanningOptions()
+        {
+            PossibleFormats = new List<BarcodeFormat>();
+            //this.AutoRotate = true;
+            DelayBetweenAnalyzingFrames = 150;
+            InitialDelayBeforeAnalyzingFrames = 300;
+            DelayBetweenContinuousScans = 1000;
+            UseNativeScanning = false;
+            ScanningArea = ScanningArea.Default;
+        }
 
-		public CameraResolutionSelectorDelegate CameraResolutionSelector { get; set; }
+        public CameraResolutionSelectorDelegate CameraResolutionSelector { get; set; }
 
-		public IEnumerable<BarcodeFormat> PossibleFormats { get; set; }
+        public IEnumerable<BarcodeFormat> PossibleFormats { get; set; }
 
-		/// <summary>
+        /// <summary>
 		/// Narrow chosen scanning area.<br/>
 		/// <b>Works only on iOS and Android</b>
 		/// </summary>
 		public ScanningArea ScanningArea { get; set; }
 
-		public bool? TryHarder { get; set; }
+        public bool? TryHarder { get; set; }
 
-		public bool? PureBarcode { get; set; }
+        public bool? PureBarcode { get; set; }
 
-		public bool? AutoRotate { get; set; }
+        public bool? AutoRotate { get; set; }
 
-		public bool? UseCode39ExtendedMode { get; set; }
+        public bool? UseCode39ExtendedMode { get; set; }
 
-		public string CharacterSet { get; set; }
+        public string CharacterSet { get; set; }
 
-		public bool? TryInverted { get; set; }
+        public bool? TryInverted { get; set; }
 
-		public bool? UseFrontCameraIfAvailable { get; set; }
+        public bool? UseFrontCameraIfAvailable { get; set; }
 
-		public bool? AssumeGS1 { get; set; }
+        public bool? AssumeGS1 { get; set; }
 
 
-		public bool DisableAutofocus { get; set; }
+        public bool DisableAutofocus { get; set; }
 
-		public bool UseNativeScanning { get; set; }
+        public bool UseNativeScanning { get; set; }
 
-		public int DelayBetweenContinuousScans { get; set; }
+        public int DelayBetweenContinuousScans { get; set; }
 
-		public int DelayBetweenAnalyzingFrames { get; set; }
-		public int InitialDelayBeforeAnalyzingFrames { get; set; }
+        public int DelayBetweenAnalyzingFrames { get; set; }
+        public int InitialDelayBeforeAnalyzingFrames { get; set; }
 
-		public static MobileBarcodeScanningOptions Default
-		{
-			get { return new MobileBarcodeScanningOptions(); }
-		}
+        /// <summary>
+        /// Only for iOS/iPadOS devices.
+        /// Sets the camera preset resolution. The higher the value the longer it needs to analyze the barcode
+        /// </summary>
+        public CameraResolutionPreset CameraResolutionPreset { get; set; } = CameraResolutionPreset.Preset640x480;
+        /// <summary>
+        /// Only for iOS
+        /// </summary>
+        public FocusPointOfInterest FocusPointOfInterest { get; set; } = new FocusPointOfInterest();
 
-		public BarcodeReaderGeneric BuildBarcodeReader()
-		{
-			var reader = new BarcodeReaderGeneric();
-			if (TryHarder.HasValue)
-				reader.Options.TryHarder = TryHarder.Value;
-			if (PureBarcode.HasValue)
-				reader.Options.PureBarcode = PureBarcode.Value;
-			if (AutoRotate.HasValue)
-				reader.AutoRotate = AutoRotate.Value;
-			if (UseCode39ExtendedMode.HasValue)
-				reader.Options.UseCode39ExtendedMode = UseCode39ExtendedMode.Value;
-			if (!string.IsNullOrEmpty(CharacterSet))
-				reader.Options.CharacterSet = CharacterSet;
-			if (TryInverted.HasValue)
-				reader.TryInverted = TryInverted.Value;
-			if (AssumeGS1.HasValue)
-				reader.Options.AssumeGS1 = AssumeGS1.Value;
+        public static MobileBarcodeScanningOptions Default
+        {
+            get { return new MobileBarcodeScanningOptions(); }
+        }
 
-			if (PossibleFormats?.Any() ?? false)
-			{
-				reader.Options.PossibleFormats = new List<BarcodeFormat>();
+        public BarcodeReaderGeneric BuildBarcodeReader()
+        {
+            var reader = new BarcodeReaderGeneric();
+            if (TryHarder.HasValue)
+                reader.Options.TryHarder = TryHarder.Value;
+            if (PureBarcode.HasValue)
+                reader.Options.PureBarcode = PureBarcode.Value;
+            if (AutoRotate.HasValue)
+                reader.AutoRotate = AutoRotate.Value;
+            if (UseCode39ExtendedMode.HasValue)
+                reader.Options.UseCode39ExtendedMode = UseCode39ExtendedMode.Value;
+            if (!string.IsNullOrEmpty(CharacterSet))
+                reader.Options.CharacterSet = CharacterSet;
+            if (TryInverted.HasValue)
+                reader.TryInverted = TryInverted.Value;
+            if (AssumeGS1.HasValue)
+                reader.Options.AssumeGS1 = AssumeGS1.Value;
 
-				foreach (var pf in PossibleFormats)
-					reader.Options.PossibleFormats.Add(pf);
-			}
+            if (PossibleFormats?.Any() ?? false)
+            {
+                reader.Options.PossibleFormats = new List<BarcodeFormat>();
 
-			return reader;
-		}
+                foreach (var pf in PossibleFormats)
+                    reader.Options.PossibleFormats.Add(pf);
+            }
 
-		public MultiFormatReader BuildMultiFormatReader()
-		{
-			var reader = new MultiFormatReader();
+            return reader;
+        }
 
-			var hints = new Dictionary<DecodeHintType, object>();
+        public MultiFormatReader BuildMultiFormatReader()
+        {
+            var reader = new MultiFormatReader();
 
-			if (TryHarder.HasValue && TryHarder.Value)
-				hints.Add(DecodeHintType.TRY_HARDER, TryHarder.Value);
-			if (PureBarcode.HasValue && PureBarcode.Value)
-				hints.Add(DecodeHintType.PURE_BARCODE, PureBarcode.Value);
+            var hints = new Dictionary<DecodeHintType, object>();
 
-			if (PossibleFormats?.Any() ?? false)
-				hints.Add(DecodeHintType.POSSIBLE_FORMATS, PossibleFormats);
+            if (TryHarder.HasValue && TryHarder.Value)
+                hints.Add(DecodeHintType.TRY_HARDER, TryHarder.Value);
+            if (PureBarcode.HasValue && PureBarcode.Value)
+                hints.Add(DecodeHintType.PURE_BARCODE, PureBarcode.Value);
 
-			reader.Hints = hints;
+            if (PossibleFormats?.Any() ?? false)
+                hints.Add(DecodeHintType.POSSIBLE_FORMATS, PossibleFormats);
 
-			return reader;
-		}
+            reader.Hints = hints;
 
-		public CameraResolution GetResolution(List<CameraResolution> availableResolutions)
-		{
-			CameraResolution r = null;
+            return reader;
+        }
 
-			var dg = CameraResolutionSelector;
+        public CameraResolution GetResolution(List<CameraResolution> availableResolutions)
+        {
+            CameraResolution r = null;
 
-			if (dg != null)
-				r = dg(availableResolutions);
+            var dg = CameraResolutionSelector;
 
-			return r;
-		}
-	}
+            if (dg != null)
+                r = dg(availableResolutions);
+
+            return r;
+        }
+    }
 }
