@@ -1,6 +1,6 @@
-<Project Sdk="MSBuild.Sdk.Extras/3.0.23">
+<Project Sdk="MSBuild.Sdk.Extras/3.0.44">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;Xamarin.iOS10;Xamarin.Mac20;MonoAndroid10.0;tizen40</TargetFrameworks>
+		<TargetFrameworks>netstandard2.1;Xamarin.iOS10;Xamarin.Mac20;MonoAndroid10.0;tizen40</TargetFrameworks>
 		<TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">$(TargetFrameworks);uap10.0.16299;</TargetFrameworks>
 		<AssemblyName>ZXingNetMobile</AssemblyName>
 		<RootNamespace>ZXing.Net.Mobile</RootNamespace>
@@ -78,9 +78,6 @@
 			<SubType>Designer</SubType>
 			<Generator>MSBuild:Compile</Generator>
 		</Page>
-		<None Update="ZXingScannerControl.xaml">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
 		<SDKReference Include="WindowsMobile, Version=10.0.16299.0">
 			<Name>Windows Mobile Extensions for the UWP</Name>
 		</SDKReference>
@@ -103,13 +100,12 @@
 		<Compile Include="**\*.macos.*.cs" />
 	</ItemGroup>
 	<ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
-		<PackageReference Include="Tizen.NET" Version="8.0.0.15631" />
 		<Compile Include="**\*.tizen.cs" />
 		<Compile Include="**\*.tizen.*.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Xamarin.Essentials" Version="1.6.0" />
-		<PackageReference Include="ZXing.Net" Version="0.16.6" />
+		<PackageReference Include="ZXing.Net" Version="0.16.8" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="iOS\Helpers\" />
